@@ -1,0 +1,16 @@
+# LJOS - Linux Journal OS
+
+# Super easy, Lazy, scripted installation of the Linux Journal OS
+# https://www.linuxjournal.com/content/diy-build-custom-minimal-linux-distribution-source
+# Petros Koutoupis
+
+# First Download the ljos_get_started.sh
+# wget ...
+# chmod 755 ./ljos_get_started.sh
+# ./ljos_get_started.sh
+
+# Once the Files have download it... 
+# cat ./ljos_get_started.sh
+# The same order or execution...
+
+#
