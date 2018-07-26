@@ -1,6 +1,5 @@
-
-# Ubuntu - Required Dependencies to compile LJOS [ Linux Journal OS ] 
-# sudo ./ljos_get_desp.sh 
+# Ubuntu - Required Dependencies to compile LJOS [ Linux Journal OS ]
+# sudo ./ljos_get_desp.sh
 
 
 apt -y install gcc
@@ -18,3 +17,9 @@ apt -y install mpc
 apt -y install texinfo
 apt -y install libcloog-isl-dev
 
+apt -y install m4
+apt -y install makeinfo
+apt -y install gawk
+apt -y install automake
+
+dpkg-reconfigure dash
