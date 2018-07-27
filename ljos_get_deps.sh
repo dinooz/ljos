@@ -22,4 +22,9 @@ apt -y install makeinfo
 apt -y install gawk
 apt -y install automake
 
+apt -y install autoconf
+apt -y install build-essential
+apt -y install libelf-dev
+apt -y install libssl-dev
+
 dpkg-reconfigure dash
