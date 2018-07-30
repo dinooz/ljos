@@ -1,7 +1,17 @@
+
+cd /mnt/sources
+
+begin=$(date +"%s")
+echo "STARTING LJOS"
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tStarting Linux Journal LJ-OS" > ~/ljos_build.log
+
 set +h 
 umask 022
 
-export LJOS=~/lj-os
+#export LJOS=~/ljos
+export LJOS=/mnt/sources/ljos
 
 echo $LJOS
 
@@ -198,9 +208,11 @@ export LJOS_CPU=k8
 export LJOS_ARCH=$(echo ${LJOS_TARGET} | sed -e 's/-.*//' -e 's/i.86/i386/')
 export LJOS_ENDIAN=little
 
-mount -t ext4 /dev/sda2 /mnt/myljos
-mkdir /mnt/myljos/sources
-cd /mnt/myljos/sources
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tUncompressing linux-4.16.3.tar.xz" >> ~/ljos_build.log
+
 tar -xf linux-4.16.3.tar.xz
 cd linux-4.16.3
 
@@ -210,6 +222,16 @@ make ARCH=${LJOS_ARCH} INSTALL_HDR_PATH=dest headers_install
 cp -rv dest/include/* ${LJOS}/usr/include
 
 cd ../
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLeaving linux-4.16.3" >> ~/ljos_build.log
+
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tUncompressing binutils-2.30.tar.xz" >> ~/ljos_build.log
+
 tar -xf binutils-2.30.tar.xz
 
 mkdir binutils-build
@@ -226,18 +248,33 @@ cp -v ../binutils-2.30/include/libiberty.h ${LJOS}/usr/include
 
 cd ../
 
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLeaving binutil-2.30" >> ~/ljos_build.log
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tUncompressing gcc-7.3.0.tar.xz" >> ~/ljos_build.log
 tar -xf gcc-7.3.0.tar.xz
 
+echo -e "`date`\t$difftimelps\t\tUncompressing gmp-6.1.2.tar.zx" >> ~/ljos_build.log
 tar -xf gmp-6.1.2.tar.xz
 mv gmp-6.1.2 gcc-7.3.0/gmp
+
+echo -e "`date`\t$difftimelps\t\tUncompressing mpfr-4.0.1.tar.xz" >> ~/ljos_build.log
 tar xJf mpfr-4.0.1.tar.xz
 mv mpfr-4.0.1 gcc-7.3.0/mpfr
+
+echo -e "`date`\t$difftimelps\t\tUncompressing mpc-1.1.0" >> ~/ljos_build.log
 tar xzf mpc-1.1.0.tar.gz
 mv mpc-1.1.0 gcc-7.3.0/mpc
 
 mkdir gcc-static
 cd gcc-static/
 
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tCompiling gcc-static" >> ~/ljos_build.log
 
 AR=ar LDFLAGS="-Wl,-rpath,${LJOS}/cross-tools/lib" \
 ../gcc-7.3.0/configure --prefix=${LJOS}/cross-tools \
@@ -258,6 +295,15 @@ make install-gcc install-target-libgcc
 ln -vs libgcc.a `${LJOS_TARGET}-gcc -print-libgcc-file-name | sed 's/libgcc/&_eh/'`
 
 cd ../
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLeaving gcc-static" >> ~/ljos_build.log
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tUncompressing glibc-2.27.tar.xz" >> ~/ljos_build.log
+
 tar -xf glibc-2.27.tar.xz
 
 mkdir glibc-build
@@ -281,6 +327,15 @@ RANLIB="${LJOS_TARGET}-ranlib" CFLAGS="-O2" \
 --cache-file=config.cache
 
 make && make install_root=${LJOS}/ install
+
+cd ../
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLeaving glibc-build"\t >> ~/ljos_build.log
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tWorking on gcc-build" >> ~/ljos_build.log
 
 mkdir gcc-build
 cd gcc-build/
@@ -308,7 +363,22 @@ export RANLIB="${LJOS_TARGET}-ranlib"
 export READELF="${LJOS_TARGET}-readelf"
 export STRIP="${LJOS_TARGET}-strip"
 
+cd ../
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLeaving gcc-build" >> ~/ljos_build.log
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tUncompressing tar -xf busybox-1.28.3.tar.bz2" >> ~/ljos_build.log
+
+tar -xf busybox-1.28.3.tar.bz2
+cd busybox-1.28.3
+
 make CROSS_COMPILE="${LJOS_TARGET}-" defconfig
+
+echo -e "`date`\t$difftimelps\t\tPlease attend the MenuConfig" >> ~/ljos_build.log
+
 make CROSS_COMPILE="${LJOS_TARGET}-" menuconfig
 
 make CROSS_COMPILE="${LJOS_TARGET}-"
@@ -322,6 +392,9 @@ make ARCH=${LJOS_ARCH} \
 CROSS_COMPILE=${LJOS_TARGET}- x86_64_defconfig
 
 make ARCH=${LJOS_ARCH} \
+
+
+echo -e "`date`\t$difftimelps\t\tPlease attend the MenuConfig" >> ~/ljos_build.log
 CROSS_COMPILE=${LJOS_TARGET}- menuconfig
 
 make ARCH=${LJOS_ARCH} \
@@ -338,21 +411,57 @@ ${LJOS}/cross-tools/bin/depmod.pl \
 -F ${LJOS}/boot/System.map-4.16.3 \
 -b ${LJOS}/lib/modules/4.16.3
 
-# Cross Linux From Scratch (CLFS) - Boot Scripts.
+cd ../
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLeaving busybox-1.28.3" >> ~/ljos_build.log
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tUncompressing tar -xf fs-embedded-bootscripts-1.0-pre5" >> ~/ljos_build.log
+
+tar -xf clfs-embedded-bootscripts-1.0-pre5.tar.bz2
+cd clfs-embedded-bootscripts-1.0-pre5
 
 make DESTDIR=${LJOS}/ install-bootscripts
 ln -sv ../rc.d/startup ${LJOS}/etc/init.d/rcS
 
+cd ../
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLeaving embedded-bootscripts" >> ~/ljos_build.log
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tUncompressing tar -xf fs-embedded-bootscripts-1.0-pre5" >> ~/ljos_build.log
+
+tar -xf zlib-1.2.11.tar.xz
+cd zlib-1.2.11
 
 sed -i 's/-O3/-Os/g' configure
 ./configure --prefix=/usr --shared
 make && make DESTDIR=${LJOS}/ install
 
-
 mv -v ${LJOS}/usr/lib/libz.so.* ${LJOS}/lib
 ln -svf ../../lib/libz.so.1 ${LJOS}/usr/lib/libz.so
 ln -svf ../../lib/libz.so.1 ${LJOS}/usr/lib/libz.so.1
 ln -svf ../lib/libz.so.1 ${LJOS}/lib64/libz.so.1
+
+cd ../
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLeaving zlib-1.2.11" >> ~/ljos_build.log
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tInstalling the Target Image" >> ~/ljos_build.log
+
+cd ${LJOS}
+
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tCopyng ljos to ljos-copy" >> ~/ljos_build.log
 
 cp -rf ljos/ ljos-copy
 
@@ -374,19 +483,26 @@ sudo mknod -m 0666 ${LJOS}-copy/dev/null c 1 3
 sudo mknod -m 0600 ${LJOS}-copy/dev/console c 5 1
 sudo chmod 4755 ${LJOS}-copy/bin/busybox
 
+
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tcd jlos-copy && sudo tar cfJ ljos-build....tar.xz" >> ~/ljos_build.log
+
 cd ljos-copy/
-sudo tar cfJ ../ljos-build-21April2018.tar.xz *
+sudo tar cfJ ../ljos-build-29July2018.tar.xz *
 
 sudo du -h|tail -n1
 
+cd ../
 ls -lh ljos-*.tar.xz
 cat /proc/partitions |grep sdd
 
-sudo mkfs.ext4 /dev/sdd1
+
+# sudo mkfs.ext4 /dev/sdd1
 sudo mkdir tmp
-sudo mount /dev/sdd1 tmp/
+sudo mount /dev/sda2 tmp/
 cd tmp/
 
-sudo tar xJf ../ljos-build-21April2018.tar.xz
-sudo grub-install --root-directory=/home/petros/tmp/ /dev/sdd
+sudo tar xJf ../ljos-build-29July2018.tar.xz
+sudo grub-install --root-directory=/home/xubuntu/tmp/ /dev/sda
 
