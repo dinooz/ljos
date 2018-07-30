@@ -506,3 +506,6 @@ cd tmp/
 sudo tar xJf ../ljos-build-29July2018.tar.xz
 sudo grub-install --root-directory=/home/xubuntu/tmp/ /dev/sda
 
+nowis=$(date +"%s")
+difftimelps=$(($nowis-$begin))
+echo -e "`date`\t$difftimelps\t\tLJOS - Build Complete" >> ~/ljos_build.log
