@@ -8,6 +8,7 @@ mount -t ext2 /dev/sda1 /mnt/system/boot
 
 free -m
 dd if=/dev/zero of=/mnt/system/swap.img bs=1024k count=1000
+chmod 600 /mnt/system/swap.img
 mkswap /mnt/system/swap.img
 swapon /mnt/system/swap.img
 free -m
