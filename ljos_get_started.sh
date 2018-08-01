@@ -10,5 +10,5 @@ wget https://raw.githubusercontent.com/dinooz/ljos/master/ljos_get_deps.sh
 
 
 wget https://raw.githubusercontent.com/dinooz/ljos/master/ljos_script_setup.sh
-
+wget https://raw.githubusercontent.com/dinooz/ljos/master/ljos_script_setup2.sh
 chmod 755 ./ljos*.sh
